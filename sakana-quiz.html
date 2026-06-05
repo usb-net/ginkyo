@@ -390,7 +390,7 @@
     <div class="score-divider"></div>
     <div class="score-item">
       <span class="score-label">QUESTION</span>
-      <span class="score-value" id="questionNum">1 / 6</span>
+      <span class="score-value" id="questionNum">1 / 5</span>
     </div>
     <div class="score-divider"></div>
     <div class="score-item">
@@ -446,24 +446,18 @@ const QUESTIONS = [
   },
   {
     img: 'q3.jpg',
-    answer: 'チチブ',
-    choices: ['チチブ', 'ハハブ', 'チチオヤ'],
-    explanation: '高知県の方言で"チチ"は子供の陰茎、"ブ"は魚という意味。なかなか衝撃的な由来を持つ魚です。綺麗で可愛らしい魚なんですが……。'
+    answer: 'カジヤゴロシ',
+    choices: ['カジヤゴロシ', 'オニゴロシ', 'ダイクゴロシ'],
+    explanation: '和歌山県でのイサキの地方名。骨が硬すぎて喉に刺さり、鍛冶屋が死んでしまったことが由来とされています。ちなみに標準和名は「イサキ」という普通の名前です。'
   },
   {
     img: 'q4.jpg',
-    answer: 'クサウオ',
-    choices: ['クサウオ', 'においウオ', 'クサリウオ'],
-    explanation: '臭いや草が由来ではなく、石川県の"つまらない"を意味する方言"くさい"から。食べると水っぽくて美味しくないことが原因かもしれません。'
-  },
-  {
-    img: 'q5.jpg',
     answer: 'カスザメ',
     choices: ['カスザメ', 'エンジェルザメ', 'ダメザメ'],
     explanation: '利用価値のない食材を"カス"と呼んだことから。実は比較的美味しい魚です。英名はエンジェルシャーク。和名と英名でギャップがありすぎます。'
   },
   {
-    img: 'q6.jpg',
+    img: 'q5.jpg',
     answer: 'ヤマノカミ',
     choices: ['ヤマノカミ', 'カワノカミ', 'ウミノカミ'],
     explanation: '山の神様に捧げられた魚がこの由来ですが……山の神様は醜い女神様で、自分より不細工な魚として捧げることで安心させていたとされています。'
@@ -573,10 +567,10 @@ function showResult() {
   document.getElementById('progressFill').style.width = '100%';
 
   const comments = [
-    [0, 1, 'さかなの命名センス、完全に謎ですね……。魚たちに謝りましょう。'],
+    [0, 1, '魚の命名センスは奥が深い……。まずは魚たちと仲良くなるところから始めましょう。'],
     [2, 3, 'なかなかの珍名知識です。もう少しで博士になれます。'],
-    [4, 5, '珍名博士に認定します。魚たちもきっと喜んでいます。'],
-    [6, 6, '満点！完全なる珍名マスターです。魚界の命名委員会に推薦します。'],
+    [4, 4, '珍名博士に認定します。魚たちもきっと喜んでいます。'],
+    [5, 5, '満点！完全なる珍名マスターです。魚界の命名委員会に推薦します。'],
   ];
 
   const comment = comments.find(([min, max]) => correct >= min && correct <= max);
