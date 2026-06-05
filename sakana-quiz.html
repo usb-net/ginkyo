@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>さかな命名クイズ | 銀京湾水族館</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;600;800&family=Share+Tech+Mono&display=swap');
+
+  :root {
+    --bg: #f7f3ec;
+    --panel: #fffef9;
+    --border: #c8b89a;
+    --border-light: #e0d4c0;
+    --accent: #1a4a6e;
+    --accent2: #b86a2a;
+    --correct: #2a6e3a;
+    --wrong: #8a2020;
+    --text: #1e1810;
+    --text-dim: #7a6a5a;
+    --tag-bg: #eaf0f8;
+    --shadow: 0 4px 20px rgba(0,0,0,0.08);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    background-image:
+      radial-gradient(circle at 20% 20%, rgba(26,74,110,0.04) 0%, transparent 50%),
+      radial-gradient(circle at 80% 80%, rgba(184,106,42,0.04) 0%, transparent 50%);
+    color: var(--text);
+    font-family: 'Shippori Mincho', serif;
+    min-height: 100vh;
+    padding: 2rem 1rem 4rem;
+  }
+
+  .container {
+    max-width: 480px;
+    margin: 0 auto;
+  }
+
+  /* ヘッダー */
+  .header {
+    text-align: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1.2rem;
+    border-bottom: 2px solid var(--border);
+    position: relative;
+  }
+
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 50%;
+    height: 1px;
+    background: var(--border-light);
+  }
+
+  .header-en {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.58rem;
+    color: var(--text-dim);
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    margin-bottom: 0.4rem;
+  }
+
+  .header h1 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--text);
+    letter-spacing: 0.1em;
+    margin-bottom: 0.3rem;
+  }
+
+  .header-sub {
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    letter-spacing: 0.08em;
+    line-height: 1.8;
+  }
+
+  /* スコア表示 */
+  .score-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding: 0.6rem 0.8rem;
+    background: var(--panel);
+    border: 1px solid var(--border-light);
+  }
+
+  .score-item {
+    text-align: center;
+  }
+
+  .score-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.55rem;
+    color: var(--text-dim);
+    letter-spacing: 0.15em;
+    display: block;
+    margin-bottom: 0.1rem;
+  }
+
+  .score-value {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--accent);
+  }
+
+  .score-divider {
+    width: 1px;
+    height: 2rem;
+    background: var(--border-light);
+  }
+
+  /* クイズカード */
+  .quiz-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    margin-bottom: 1rem;
+  }
+
+  .question-num {
+    background: var(--accent);
+    color: #fff;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    padding: 0.4rem 0.8rem;
+  }
+
+  .fish-img-wrap {
+    width: 100%;
+    height: 220px;
+    overflow: hidden;
+    background: #e8e0d4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  .fish-img-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+
+  .fish-img-wrap img:hover {
+    transform: scale(1.02);
+  }
+
+  .img-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-dim);
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+  }
+
+  .question-text {
+    padding: 1rem 1.2rem 0.8rem;
+    font-size: 0.9rem;
+    line-height: 1.8;
+    color: var(--text);
+    border-bottom: 1px solid var(--border-light);
+  }
+
+  /* 選択肢 */
+  .choices {
+    padding: 0.8rem 1.2rem 1.2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .choice-btn {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'Shippori Mincho', serif;
+    font-size: 0.9rem;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.15s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+  }
+
+  .choice-btn:hover:not(:disabled) {
+    background: var(--tag-bg);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .choice-btn:disabled {
+    cursor: default;
+  }
+
+  .choice-btn.correct {
+    background: #eaf5ec;
+    border-color: var(--correct);
+    color: var(--correct);
+  }
+
+  .choice-btn.wrong {
+    background: #f5eaea;
+    border-color: var(--wrong);
+    color: var(--wrong);
+  }
+
+  .choice-btn.reveal {
+    background: #eaf5ec;
+    border-color: var(--correct);
+    color: var(--correct);
+  }
+
+  .choice-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.65rem;
+    width: 1.4rem;
+    height: 1.4rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid currentColor;
+    flex-shrink: 0;
+  }
+
+  /* 解説 */
+  .explanation {
+    margin: 0 1.2rem 1.2rem;
+    padding: 0.8rem;
+    background: #f8f4ec;
+    border-left: 3px solid var(--accent2);
+    font-size: 0.78rem;
+    line-height: 1.9;
+    color: var(--text);
+    display: none;
+  }
+
+  .explanation.show {
+    display: block;
+    animation: fadein 0.3s ease;
+  }
+
+  .explanation-title {
+    font-weight: 600;
+    color: var(--accent2);
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.3rem;
+  }
+
+  /* 次へボタン */
+  .btn-next {
+    display: none;
+    width: calc(100% - 2.4rem);
+    margin: 0 1.2rem 1.2rem;
+    padding: 0.8rem;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    font-family: 'Shippori Mincho', serif;
+    font-size: 0.85rem;
+    letter-spacing: 0.2em;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .btn-next:hover { background: #123d5c; }
+  .btn-next.show { display: block; animation: fadein 0.3s ease 0.3s both; }
+
+  /* 結果画面 */
+  .result-screen {
+    display: none;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    padding: 2rem 1.5rem;
+    text-align: center;
+    box-shadow: var(--shadow);
+  }
+
+  .result-screen.show { display: block; animation: fadein 0.4s ease; }
+
+  .result-title {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--text-dim);
+    letter-spacing: 0.3em;
+    margin-bottom: 0.8rem;
+  }
+
+  .result-score {
+    font-size: 3rem;
+    font-weight: 800;
+    color: var(--accent);
+    line-height: 1;
+    margin-bottom: 0.3rem;
+  }
+
+  .result-total {
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    margin-bottom: 1.5rem;
+    letter-spacing: 0.05em;
+  }
+
+  .result-comment {
+    font-size: 0.85rem;
+    line-height: 2;
+    color: var(--text);
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: var(--bg);
+    border: 1px solid var(--border-light);
+  }
+
+  .btn-retry {
+    padding: 0.8rem 2rem;
+    background: transparent;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    font-family: 'Shippori Mincho', serif;
+    font-size: 0.85rem;
+    letter-spacing: 0.2em;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-retry:hover {
+    background: var(--accent);
+    color: #fff;
+  }
+
+  @keyframes fadein {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .progress {
+    height: 3px;
+    background: var(--border-light);
+    margin-bottom: 1.5rem;
+    position: relative;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    transition: width 0.4s ease;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <div class="header-en">FISH NAMING QUIZ / GINKYO BAY AQUARIUM</div>
+    <h1>さかな命名クイズ</h1>
+    <div class="header-sub">
+      新種命名体験コーナー特別企画<br>
+      過去に来館者によって命名された生物たち。<br>
+      さて、この名前はどの生物につけられたでしょう？<br>
+      写真を見て3択から正解を選んでください。
+    </div>
+  </div>
+
+  <div class="score-bar">
+    <div class="score-item">
+      <span class="score-label">SCORE</span>
+      <span class="score-value" id="scoreVal">0</span>
+    </div>
+    <div class="score-divider"></div>
+    <div class="score-item">
+      <span class="score-label">QUESTION</span>
+      <span class="score-value" id="questionNum">1 / 6</span>
+    </div>
+    <div class="score-divider"></div>
+    <div class="score-item">
+      <span class="score-label">CORRECT</span>
+      <span class="score-value" id="correctVal">0</span>
+    </div>
+  </div>
+
+  <div class="progress">
+    <div class="progress-fill" id="progressFill" style="width:0%"></div>
+  </div>
+
+  <div class="quiz-card" id="quizCard">
+    <div class="question-num" id="questionNumLabel">QUESTION 01</div>
+    <div class="fish-img-wrap">
+      <img id="fishImg" src="" alt="魚の写真" onerror="this.style.display='none';document.querySelector('.img-placeholder').style.display='flex'">
+      <div class="img-placeholder" style="display:none">
+        <div class="placeholder-icon">🐟</div>
+        <div class="placeholder-text">IMAGE NOT FOUND</div>
+      </div>
+    </div>
+    <div class="question-text">この生物につけられた名前はどれでしょう？</div>
+    <div class="choices" id="choices"></div>
+    <div class="explanation" id="explanation">
+      <div class="explanation-title">― 由来 ―</div>
+      <div id="explanationText"></div>
+    </div>
+    <button class="btn-next" id="btnNext" onclick="nextQuestion()">次の問題へ ―</button>
+  </div>
+
+  <div class="result-screen" id="resultScreen">
+    <div class="result-title">RESULT</div>
+    <div class="result-score" id="resultScore">0</div>
+    <div class="result-total" id="resultTotal">点 / 6問</div>
+    <div class="result-comment" id="resultComment"></div>
+    <button class="btn-retry" onclick="startQuiz()">もう一度挑戦する</button>
+  </div>
+</div>
+
+<script>
+const QUESTIONS = [
+  {
+    img: 'q1.jpg',
+    answer: 'オジサン',
+    choices: ['オジサン', 'オバサン', 'オトナリサン'],
+    explanation: '立派な口ひげが老人（翁）を思わせることから。"お爺さん"がなまって"オジサン"になったというのが定説です。ちなみにオバサンはいません。'
+  },
+  {
+    img: 'q2.jpg',
+    answer: 'ウッカリカサゴ',
+    choices: ['ウッカリカサゴ', 'ドンマイカサゴ', 'ソックリカサゴ'],
+    explanation: '長い間カサゴと混同されていたことから。日本の魚類学者が"うっかり"見落としていたという皮肉を込めて命名されました。'
+  },
+  {
+    img: 'q3.jpg',
+    answer: 'チチブ',
+    choices: ['チチブ', 'ハハブ', 'チチオヤ'],
+    explanation: '高知県の方言で"チチ"は子供の陰茎、"ブ"は魚という意味。なかなか衝撃的な由来を持つ魚です。綺麗で可愛らしい魚なんですが……。'
+  },
+  {
+    img: 'q4.jpg',
+    answer: 'クサウオ',
+    choices: ['クサウオ', 'においウオ', 'クサリウオ'],
+    explanation: '臭いや草が由来ではなく、石川県の"つまらない"を意味する方言"くさい"から。食べると水っぽくて美味しくないことが原因かもしれません。'
+  },
+  {
+    img: 'q5.jpg',
+    answer: 'カスザメ',
+    choices: ['カスザメ', 'エンジェルザメ', 'ダメザメ'],
+    explanation: '利用価値のない食材を"カス"と呼んだことから。実は比較的美味しい魚です。英名はエンジェルシャーク。和名と英名でギャップがありすぎます。'
+  },
+  {
+    img: 'q6.jpg',
+    answer: 'ヤマノカミ',
+    choices: ['ヤマノカミ', 'カワノカミ', 'ウミノカミ'],
+    explanation: '山の神様に捧げられた魚がこの由来ですが……山の神様は醜い女神様で、自分より不細工な魚として捧げることで安心させていたとされています。'
+  }
+];
+
+let current = 0;
+let score = 0;
+let correct = 0;
+let answered = false;
+let shuffled = [];
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function startQuiz() {
+  current = 0;
+  score = 0;
+  correct = 0;
+  shuffled = shuffle(QUESTIONS);
+  document.getElementById('resultScreen').classList.remove('show');
+  document.getElementById('quizCard').style.display = 'block';
+  updateScore();
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = shuffled[current];
+  answered = false;
+
+  document.getElementById('questionNumLabel').textContent = `QUESTION ${String(current + 1).padStart(2, '0')}`;
+  document.getElementById('questionNum').textContent = `${current + 1} / ${shuffled.length}`;
+  document.getElementById('progressFill').style.width = `${(current / shuffled.length) * 100}%`;
+
+  const img = document.getElementById('fishImg');
+  img.style.display = 'block';
+  img.src = q.img;
+  document.querySelector('.img-placeholder').style.display = 'none';
+
+  const choicesEl = document.getElementById('choices');
+  const labels = ['A', 'B', 'C'];
+  const shuffledChoices = shuffle(q.choices);
+
+  choicesEl.innerHTML = shuffledChoices.map((c, i) => `
+    <button class="choice-btn" onclick="answer('${c}', this)" data-value="${c}">
+      <span class="choice-label">${labels[i]}</span>${c}
+    </button>
+  `).join('');
+
+  document.getElementById('explanation').classList.remove('show');
+  document.getElementById('explanationText').textContent = '';
+  document.getElementById('btnNext').classList.remove('show');
+}
+
+function answer(val, btn) {
+  if (answered) return;
+  answered = true;
+
+  const q = shuffled[current];
+  const allBtns = document.querySelectorAll('.choice-btn');
+
+  allBtns.forEach(b => {
+    b.disabled = true;
+    if (b.dataset.value === q.answer) {
+      b.classList.add(val === q.answer ? 'correct' : 'reveal');
+    }
+  });
+
+  if (val === q.answer) {
+    btn.classList.add('correct');
+    correct++;
+    score += 10;
+  } else {
+    btn.classList.add('wrong');
+  }
+
+  updateScore();
+
+  document.getElementById('explanationText').textContent = q.explanation;
+  document.getElementById('explanation').classList.add('show');
+  document.getElementById('btnNext').classList.add('show');
+  document.getElementById('btnNext').textContent = current < shuffled.length - 1 ? '次の問題へ ―' : '結果を見る ―';
+}
+
+function nextQuestion() {
+  current++;
+  if (current >= shuffled.length) {
+    showResult();
+  } else {
+    renderQuestion();
+  }
+}
+
+function updateScore() {
+  document.getElementById('scoreVal').textContent = score;
+  document.getElementById('correctVal').textContent = correct;
+}
+
+function showResult() {
+  document.getElementById('quizCard').style.display = 'none';
+  document.getElementById('progressFill').style.width = '100%';
+
+  const comments = [
+    [0, 1, 'さかなの命名センス、完全に謎ですね……。魚たちに謝りましょう。'],
+    [2, 3, 'なかなかの珍名知識です。もう少しで博士になれます。'],
+    [4, 5, '珍名博士に認定します。魚たちもきっと喜んでいます。'],
+    [6, 6, '満点！完全なる珍名マスターです。魚界の命名委員会に推薦します。'],
+  ];
+
+  const comment = comments.find(([min, max]) => correct >= min && correct <= max);
+
+  document.getElementById('resultScore').textContent = score;
+  document.getElementById('resultTotal').textContent = `点 ／ ${shuffled.length}問中 ${correct}問正解`;
+  document.getElementById('resultComment').textContent = comment[2];
+  document.getElementById('resultScreen').classList.add('show');
+}
+
+startQuiz();
+</script>
+</body>
+</html>
