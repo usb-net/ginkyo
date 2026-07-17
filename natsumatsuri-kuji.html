@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>くじびき抽選器｜宇宙夏祭り</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Shippori+Mincho:wght@600;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --night:#101532;--night-deep:#0a0d22;--washi:#f6f1e3;--sumi:#2b2438;
+  --shu:#ff6b4a;--kin:#ffc94d;--neon:#4de8d2;--murasaki:#8a7bd8;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  font-family:'Zen Kaku Gothic New',sans-serif;
+  background:linear-gradient(180deg,var(--night-deep),var(--night) 55%,#1c1e46);
+  color:var(--washi);min-height:100vh;line-height:1.8;
+}
+header{text-align:center;padding:26px 16px 10px}
+.eyebrow{font-family:'DotGothic16',monospace;color:var(--neon);font-size:12px;letter-spacing:.3em}
+h1{
+  font-family:'Shippori Mincho',serif;font-weight:800;font-size:clamp(30px,8vw,44px);
+  letter-spacing:.08em;margin-top:6px;
+  background:linear-gradient(180deg,#fff 20%,var(--kin) 70%,var(--shu));
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.sub{font-size:13px;color:var(--murasaki)}
+main{max-width:480px;margin:0 auto;padding:10px 16px 60px}
+/* ガラガラ本体 */
+.machine{
+  margin:22px auto 0;width:230px;position:relative;text-align:center;
+}
+.drum{
+  width:180px;height:180px;margin:0 auto;border-radius:20px;
+  background:linear-gradient(160deg,#c8402c,#8f2417);
+  border:5px solid var(--kin);
+  box-shadow:0 0 26px rgba(255,107,74,.4), inset 0 -14px 22px rgba(0,0,0,.4);
+  position:relative;display:flex;align-items:center;justify-content:center;
+}
+.drum .kanji{font-family:'Shippori Mincho',serif;font-size:56px;color:var(--washi);text-shadow:0 2px 4px rgba(0,0,0,.5)}
+.drum .handle{
+  position:absolute;right:-32px;top:50%;width:14px;height:60px;margin-top:-30px;
+  background:#d8c9a4;border-radius:7px;box-shadow:0 2px 4px rgba(0,0,0,.5);
+  transform-origin:50% 10%;
+}
+.drum.spin{animation:shake .5s infinite}
+.drum.spin .handle{animation:crank .5s infinite linear}
+@keyframes shake{0%,100%{transform:rotate(0)}25%{transform:rotate(-2deg)}75%{transform:rotate(2deg)}}
+@keyframes crank{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+.tray{
+  width:120px;height:16px;margin:0 auto;background:#3a3350;border-radius:0 0 12px 12px;
+  box-shadow:inset 0 4px 6px rgba(0,0,0,.6);
+}
+.ball{
+  width:44px;height:44px;border-radius:50%;margin:-6px auto 0;opacity:0;
+  box-shadow:inset -6px -8px 12px rgba(0,0,0,.35), 0 0 18px currentColor;
+  transition:opacity .3s;
+}
+.ball.show{opacity:1;animation:drop .5s ease-out}
+@keyframes drop{0%{transform:translateY(-70px);opacity:0}60%{transform:translateY(6px);opacity:1}100%{transform:translateY(0)}}
+/* ボタン */
+.draw-btn{
+  display:block;width:100%;max-width:280px;margin:26px auto 0;
+  font-family:'DotGothic16',monospace;font-size:20px;letter-spacing:.2em;
+  color:var(--night-deep);background:var(--kin);border:none;border-radius:10px;
+  padding:16px 0;cursor:pointer;box-shadow:0 4px 0 #a8802a;
+}
+.draw-btn:active{transform:translateY(3px);box-shadow:0 1px 0 #a8802a}
+.draw-btn:disabled{opacity:.5;cursor:default}
+/* 結果 */
+.result{
+  margin-top:22px;background:var(--washi);color:var(--sumi);border-radius:12px;
+  padding:20px 18px;text-align:center;display:none;
+  box-shadow:0 4px 0 rgba(0,0,0,.35);
+}
+.result.show{display:block;animation:pop .35s ease-out}
+@keyframes pop{from{transform:scale(.9);opacity:0}to{transform:scale(1);opacity:1}}
+.result .rank{
+  font-family:'Shippori Mincho',serif;font-size:30px;font-weight:800;letter-spacing:.15em;
+}
+.result .prize{font-size:17px;font-weight:700;margin-top:6px}
+.result .flavor{font-size:13px;color:#6b6455;margin-top:8px;line-height:1.7}
+/* 履歴 */
+.log{margin-top:24px}
+.log h2{font-family:'Shippori Mincho',serif;font-size:16px;color:var(--kin);letter-spacing:.15em;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.log h2::before{content:"";width:8px;height:8px;background:var(--shu);transform:rotate(45deg)}
+.log ul{list-style:none}
+.log li{
+  font-size:13px;background:rgba(246,241,227,.08);border:1px solid #34346a;
+  border-radius:8px;padding:8px 12px;margin-bottom:6px;display:flex;gap:10px;align-items:center;
+}
+.log .dot{width:14px;height:14px;border-radius:50%;flex-shrink:0;box-shadow:0 0 6px currentColor}
+/* 景品表 */
+.table{margin-top:26px;background:var(--washi);color:var(--sumi);border-radius:12px;padding:16px;box-shadow:0 4px 0 rgba(0,0,0,.35)}
+.table h2{font-family:'Shippori Mincho',serif;text-align:center;letter-spacing:.3em;font-size:16px;border-bottom:2px solid var(--sumi);padding-bottom:8px;margin-bottom:10px}
+.table li{list-style:none;display:flex;justify-content:space-between;gap:10px;font-size:13.5px;padding:7px 2px;border-bottom:1px dashed #c9c1ab}
+.table li:last-child{border-bottom:none}
+.table .r{font-weight:700;white-space:nowrap}
+.back{display:block;text-align:center;margin-top:28px;font-family:'DotGothic16',monospace;color:var(--neon);text-decoration:none;letter-spacing:.15em;font-size:14px}
+@media (prefers-reduced-motion:reduce){.drum.spin,.drum.spin .handle,.ball.show,.result.show{animation:none}}
+</style>
+</head>
+<body>
+<header>
+  <div class="eyebrow">GINKYO FESTIVAL LOTTERY</div>
+  <h1>くじびき抽選器</h1>
+  <div class="sub">一回まわして、出た玉の色が運命です</div>
+</header>
+
+<main>
+  <div class="machine">
+    <div class="drum" id="drum">
+      <div class="kanji">運</div>
+      <div class="handle"></div>
+    </div>
+    <div class="tray"></div>
+    <div class="ball" id="ball"></div>
+  </div>
+
+  <button class="draw-btn" id="drawBtn">ガラガラをまわす</button>
+
+  <div class="result" id="result">
+    <div class="rank" id="rRank"></div>
+    <div class="prize" id="rPrize"></div>
+    <div class="flavor" id="rFlavor"></div>
+  </div>
+
+  <div class="log">
+    <h2>本日の結果</h2>
+    <ul id="logList"></ul>
+  </div>
+
+  <div class="table">
+    <h2>景品表</h2>
+    <ul>
+      <li><span class="r" style="color:#c0392b">特等（金）</span><span>ミナミちゃん直筆サイン入りポスター</span></li>
+      <li><span class="r" style="color:#c0392b">一等（赤）</span><span>最新ゲーム機</span></li>
+      <li><span class="r" style="color:#1a7f8e">二等（青）</span><span>ゲームソフト</span></li>
+      <li><span class="r" style="color:#1e8f5a">三等（緑）</span><span>光るブレスレット</span></li>
+      <li><span class="r" style="color:#7a5bbf">四等（紫）</span><span>スーパーボール</span></li>
+      <li><span class="r" style="color:#8a7a55">五等（白）</span><span>駄菓子つめあわせ（代替甘味料）</span></li>
+      <li><span class="r" style="color:#333">はずれ（黒）</span><span>地獄のピーヒャラ</span></li>
+    </ul>
+  </div>
+
+  <a class="back" href="natsumatsuri-guide.html">← 祭り公式ガイドへもどる</a>
+</main>
+
+<script>
+const PRIZES=[
+  {w:1, rank:"特等", color:"#ffc94d", css:"#ffc94d",
+   prize:"ミナミちゃん直筆サイン入りポスター",
+   flavor:"店主が拍手しながら鐘を鳴らします。周囲がざわつき、行列の視線が突き刺さります。"},
+  {w:4, rank:"一等", color:"#ff6b4a", css:"#ff6b4a",
+   prize:"最新ゲーム機",
+   flavor:"大きな箱を抱えて祭りを歩くことになります。持ち手はどちらが担当しますか？"},
+  {w:10, rank:"二等", color:"#4da6ff", css:"#4da6ff",
+   prize:"ゲームソフト（選択）",
+   flavor:"棚の中から好きな一本をどうぞ。対戦できるものを選ぶかは、お二人次第です。"},
+  {w:20, rank:"三等", color:"#3ecf8e", css:"#3ecf8e",
+   prize:"光るブレスレット",
+   flavor:"腕に巻けば夜道でよく光ります。おそろいにするかは、お好みで。"},
+  {w:30, rank:"四等", color:"#a78bfa", css:"#a78bfa",
+   prize:"スーパーボール",
+   flavor:"よく跳ねます。人混みで落とすと、二度と会えません。"},
+  {w:30, rank:"五等", color:"#f6f1e3", css:"#f6f1e3",
+   prize:"駄菓子つめあわせ（代替甘味料）",
+   flavor:"本物の砂糖ではありませんが、祭りの味はします。たぶん。"},
+  {w:5, rank:"はずれ", color:"#3a3a3a", css:"#555",
+   prize:"地獄のピーヒャラ",
+   flavor:"吹くと、この世のものとは思えない音が鳴る笛。返品はできません。責任を持って鳴らしてください。"}
+];
+const total=PRIZES.reduce((a,p)=>a+p.w,0);
+const drum=document.getElementById('drum');
+const ball=document.getElementById('ball');
+const btn=document.getElementById('drawBtn');
+const result=document.getElementById('result');
+const rRank=document.getElementById('rRank');
+const rPrize=document.getElementById('rPrize');
+const rFlavor=document.getElementById('rFlavor');
+const logList=document.getElementById('logList');
+let count=0;
+
+btn.addEventListener('click',()=>{
+  btn.disabled=true;
+  result.classList.remove('show');
+  ball.classList.remove('show');
+  drum.classList.add('spin');
+  setTimeout(()=>{
+    drum.classList.remove('spin');
+    let r=Math.random()*total,pick=PRIZES[PRIZES.length-1];
+    for(const p of PRIZES){ if(r<p.w){pick=p;break;} r-=p.w; }
+    ball.style.background=`radial-gradient(circle at 35% 30%, #fff8, transparent 40%), ${pick.color}`;
+    ball.style.color=pick.color;
+    ball.classList.add('show');
+    setTimeout(()=>{
+      rRank.textContent=pick.rank;
+      rRank.style.color=pick.css==="#f6f1e3"?"#8a7a55":pick.css;
+      rPrize.textContent=pick.prize;
+      rFlavor.textContent=pick.flavor;
+      result.classList.add('show');
+      count++;
+      const li=document.createElement('li');
+      li.innerHTML=`<span class="dot" style="background:${pick.color};color:${pick.color}"></span><span>${count}回目：${pick.rank}「${pick.prize}」</span>`;
+      logList.prepend(li);
+      btn.disabled=false;
+      btn.textContent="もう一回まわす";
+    },600);
+  },1400);
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>銀京府 宇宙夏祭り 公式ガイド</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Shippori+Mincho:wght@600;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --night:#101532;
+  --night-deep:#0a0d22;
+  --washi:#f6f1e3;
+  --sumi:#2b2438;
+  --shu:#ff6b4a;
+  --kin:#ffc94d;
+  --neon:#4de8d2;
+  --murasaki:#8a7bd8;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  font-family:'Zen Kaku Gothic New',sans-serif;
+  background:linear-gradient(180deg,var(--night-deep) 0%,var(--night) 45%,#1c1e46 100%);
+  color:var(--washi);
+  line-height:1.9;
+  overflow-x:hidden;
+}
+/* 星 */
+.stars{position:fixed;inset:0;pointer-events:none;z-index:0}
+.stars span{position:absolute;width:2px;height:2px;background:#fff;border-radius:50%;opacity:.6;animation:tw 3s infinite}
+@keyframes tw{0%,100%{opacity:.15}50%{opacity:.8}}
+/* 提灯 */
+.lanterns{display:flex;justify-content:space-around;padding:14px 6px 0;position:relative;z-index:2}
+.lantern{width:34px;height:44px;border-radius:45%/50%;position:relative;animation:sway 4s ease-in-out infinite}
+.lantern::before{content:"";position:absolute;top:-8px;left:50%;transform:translateX(-50%);width:14px;height:8px;background:#3a3350;border-radius:3px}
+.lantern::after{content:"祭";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Shippori Mincho',serif;font-size:15px;color:rgba(40,20,10,.75)}
+.lantern:nth-child(odd){background:radial-gradient(circle at 50% 35%,#ffd98a,var(--shu));box-shadow:0 0 22px rgba(255,120,70,.55);animation-delay:-1s}
+.lantern:nth-child(even){background:radial-gradient(circle at 50% 35%,#c8fff4,var(--neon));box-shadow:0 0 22px rgba(77,232,210,.45)}
+.lantern:nth-child(even)::after{content:"宙"}
+@keyframes sway{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(4deg)}}
+/* 電光掲示板 */
+.ticker{
+  margin:16px auto 0;max-width:680px;
+  background:#050510;border:2px solid #2c2c55;border-radius:8px;
+  overflow:hidden;position:relative;z-index:2;
+  box-shadow:0 0 14px rgba(77,232,210,.25), inset 0 0 18px rgba(0,0,0,.9);
+}
+.ticker-inner{
+  display:inline-block;white-space:nowrap;
+  font-family:'DotGothic16',monospace;font-size:15px;color:var(--neon);
+  padding:8px 0;text-shadow:0 0 6px rgba(77,232,210,.8);
+  animation:scroll 38s linear infinite;
+}
+@keyframes scroll{from{transform:translateX(100vw)}to{transform:translateX(-100%)}}
+/* ヒーロー */
+header{position:relative;z-index:2;text-align:center;padding:34px 16px 26px}
+.date-eyebrow{font-family:'DotGothic16',monospace;color:var(--kin);letter-spacing:.3em;font-size:13px}
+h1{
+  font-family:'Shippori Mincho',serif;font-weight:800;
+  font-size:clamp(34px,9vw,58px);line-height:1.25;letter-spacing:.06em;
+  margin:10px 0 6px;
+  background:linear-gradient(180deg,#fff 20%,var(--kin) 70%,var(--shu));
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 0 18px rgba(255,201,77,.35));
+}
+.sub{color:var(--murasaki);font-size:14px;letter-spacing:.15em}
+.hero-torii{font-size:44px;margin-top:8px;filter:drop-shadow(0 0 12px rgba(255,107,74,.6))}
+/* 共通セクション */
+main{position:relative;z-index:2;max-width:680px;margin:0 auto;padding:0 16px 60px}
+section{margin-top:38px}
+h2{
+  font-family:'Shippori Mincho',serif;font-size:22px;letter-spacing:.12em;
+  color:var(--kin);display:flex;align-items:center;gap:10px;margin-bottom:14px;
+}
+h2::before{content:"";width:10px;height:10px;background:var(--shu);transform:rotate(45deg);box-shadow:0 0 8px var(--shu)}
+/* タイムテーブル */
+.timeline{border-left:2px solid #3a3a68;margin-left:8px;padding-left:20px}
+.t-item{position:relative;padding-bottom:16px}
+.t-item::before{content:"";position:absolute;left:-26px;top:8px;width:10px;height:10px;border-radius:50%;background:var(--neon);box-shadow:0 0 8px var(--neon)}
+.t-time{font-family:'DotGothic16',monospace;color:var(--neon);font-size:15px}
+.t-name{font-weight:700}
+.t-note{font-size:13px;color:#b9b3d6}
+/* マップ */
+.map-wrap{background:#0b0e26;border:1px solid #34346a;border-radius:12px;padding:12px}
+.map-wrap svg{width:100%;height:auto;display:block}
+.map-note{font-size:12px;color:#9c96c2;text-align:center;margin-top:6px}
+/* 屋台カード（和紙） */
+.stall{
+  background:var(--washi);color:var(--sumi);border-radius:10px;
+  padding:14px 16px;margin-bottom:12px;
+  box-shadow:0 3px 0 rgba(0,0,0,.35);
+  border-top:4px solid var(--shu);
+}
+.stall:nth-child(even){border-top-color:var(--neon)}
+.stall h3{font-family:'Shippori Mincho',serif;font-size:17px;display:flex;justify-content:space-between;align-items:baseline}
+.stall h3 .tag{font-family:'DotGothic16',monospace;font-size:11px;color:#fff;background:var(--sumi);padding:2px 8px;border-radius:20px;letter-spacing:.1em}
+.stall p{font-size:13.5px;line-height:1.8;margin-top:4px}
+.stall .warn{display:inline-block;margin-top:6px;font-size:12px;color:#a8322a;border:1px solid #a8322a;border-radius:4px;padding:1px 8px}
+/* 注意事項 */
+.rules{background:var(--washi);color:var(--sumi);border-radius:10px;padding:18px 18px 14px;box-shadow:0 3px 0 rgba(0,0,0,.35)}
+.rules h3{font-family:'Shippori Mincho',serif;text-align:center;letter-spacing:.3em;border-bottom:2px solid var(--sumi);padding-bottom:8px;margin-bottom:12px}
+.rules li{list-style:none;font-size:13.5px;padding:7px 0 7px 26px;position:relative;border-bottom:1px dashed #c9c1ab}
+.rules li:last-child{border-bottom:none}
+.rules li::before{content:"※";position:absolute;left:2px;color:var(--shu);font-weight:700}
+/* 花火 */
+.fw-box{
+  text-align:center;background:#0b0e26;border:1px solid #34346a;border-radius:12px;padding:26px 16px;
+  position:relative;overflow:hidden;
+}
+.fw-box .big{font-family:'Shippori Mincho',serif;font-size:26px;color:#fff;letter-spacing:.1em}
+.fw-box .time{font-family:'DotGothic16',monospace;color:var(--kin);font-size:20px;text-shadow:0 0 8px rgba(255,201,77,.7)}
+.fw{position:absolute;border-radius:50%;pointer-events:none;animation:boom 2.6s ease-out infinite}
+@keyframes boom{0%{transform:scale(0);opacity:1}70%{opacity:.5}100%{transform:scale(1);opacity:0}}
+/* リンク */
+.links{display:flex;gap:12px;margin-top:16px;flex-wrap:wrap}
+.links a{
+  flex:1;min-width:150px;text-align:center;text-decoration:none;
+  font-family:'DotGothic16',monospace;font-size:15px;letter-spacing:.1em;
+  color:var(--night-deep);background:var(--kin);border-radius:8px;padding:12px 8px;
+  box-shadow:0 3px 0 #a8802a;
+}
+.links a:active{transform:translateY(2px);box-shadow:0 1px 0 #a8802a}
+footer{text-align:center;font-size:11px;color:#7a75a0;padding:20px 0 30px;position:relative;z-index:2}
+@media (prefers-reduced-motion:reduce){
+  .ticker-inner,.lantern,.stars span,.fw{animation:none}
+}
+</style>
+</head>
+<body>
+<div class="stars" id="stars"></div>
+
+<div class="lanterns">
+  <div class="lantern"></div><div class="lantern"></div><div class="lantern"></div>
+  <div class="lantern"></div><div class="lantern"></div><div class="lantern"></div>
+</div>
+
+<div class="ticker"><div class="ticker-inner">
+  ◆ 本日開催 ◆ 宇宙夏祭り ◆ 花火打上は20:30より ◆ 会場内での砂糖類の無許可販売・持込は連邦法により固く禁じられています ◆ 射的・輪投げ等における電子照準補正のご利用はご遠慮ください ◆ はぐれた方はピコポの位置共有機能をご利用ください ◆ ホバリング車は第2駐車場へ ◆
+</div></div>
+
+<header>
+  <div class="date-eyebrow">GINKYO-FU SUMMER FESTIVAL</div>
+  <h1>宇宙夏祭り</h1>
+  <div class="sub">― 銀京府 星空納涼大会 ―</div>
+  <div class="hero-torii">⛩</div>
+</header>
+
+<main>
+
+<section>
+  <h2>タイムテーブル</h2>
+  <div class="timeline">
+    <div class="t-item"><div class="t-time">17:00</div><div class="t-name">開場・屋台営業開始</div><div class="t-note">提灯点灯は日没後、一斉に行われます。</div></div>
+    <div class="t-item"><div class="t-time">18:30</div><div class="t-name">盆踊り（電光やぐら）</div><div class="t-note">飛び入り参加歓迎。サイボーグの方も動力音を気にせずどうぞ。</div></div>
+    <div class="t-item"><div class="t-time">19:30</div><div class="t-name">縁日タイム</div><div class="t-note">くじびき・射的の景品が夜の部に切り替わります。</div></div>
+    <div class="t-item"><div class="t-time">20:30</div><div class="t-name">打上花火</div><div class="t-note">観覧おすすめは参道広場。穴場は…探してみてください。</div></div>
+    <div class="t-item"><div class="t-time">21:30</div><div class="t-name">閉場</div><div class="t-note">お忘れ物・迷子のお知らせは本部やぐらまで。</div></div>
+  </div>
+</section>
+
+<section>
+  <h2>会場マップ</h2>
+  <div class="map-wrap">
+    <svg viewBox="0 0 340 260" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="会場マップ">
+      <defs>
+        <style>
+          .lbl{font:600 10px 'Zen Kaku Gothic New',sans-serif;fill:#f6f1e3}
+          .lbl2{font:600 9px 'Zen Kaku Gothic New',sans-serif;fill:#0a0d22}
+          .booth{rx:6}
+        </style>
+      </defs>
+      <!-- 参道 -->
+      <rect x="150" y="30" width="40" height="230" fill="#2c2c55"/>
+      <text x="170" y="250" text-anchor="middle" class="lbl" font-size="9">入口</text>
+      <!-- 鳥居 -->
+      <g transform="translate(170,26)">
+        <rect x="-26" y="-16" width="52" height="6" fill="#ff6b4a"/>
+        <rect x="-20" y="-10" width="40" height="4" fill="#ff6b4a"/>
+        <rect x="-18" y="-8" width="5" height="22" fill="#ff6b4a"/>
+        <rect x="13" y="-8" width="5" height="22" fill="#ff6b4a"/>
+      </g>
+      <text x="170" y="52" text-anchor="middle" class="lbl">神社</text>
+      <!-- やぐら -->
+      <rect x="155" y="120" width="30" height="30" fill="#ffc94d" class="booth"/>
+      <text x="170" y="138" text-anchor="middle" class="lbl2">やぐら</text>
+      <!-- 左列 -->
+      <rect x="30" y="70" width="100" height="26" fill="#ff6b4a" class="booth"/>
+      <text x="80" y="87" text-anchor="middle" class="lbl2">射的・輪投げ</text>
+      <rect x="30" y="106" width="100" height="26" fill="#4de8d2" class="booth"/>
+      <text x="80" y="123" text-anchor="middle" class="lbl2">宇宙金魚すくい</text>
+      <rect x="30" y="142" width="100" height="26" fill="#ff6b4a" class="booth"/>
+      <text x="80" y="159" text-anchor="middle" class="lbl2">宇宙鶏焼き鳥</text>
+      <rect x="30" y="178" width="100" height="26" fill="#4de8d2" class="booth"/>
+      <text x="80" y="195" text-anchor="middle" class="lbl2">宇宙ガニ焼き</text>
+      <!-- 右列 -->
+      <rect x="210" y="70" width="100" height="26" fill="#4de8d2" class="booth"/>
+      <text x="260" y="87" text-anchor="middle" class="lbl2">くじびき</text>
+      <rect x="210" y="106" width="100" height="26" fill="#ff6b4a" class="booth"/>
+      <text x="260" y="123" text-anchor="middle" class="lbl2">わたあめ（許可店）</text>
+      <rect x="210" y="142" width="100" height="26" fill="#4de8d2" class="booth"/>
+      <text x="260" y="159" text-anchor="middle" class="lbl2">かき氷・飲みもの</text>
+      <rect x="210" y="178" width="100" height="26" fill="#ff6b4a" class="booth"/>
+      <text x="260" y="195" text-anchor="middle" class="lbl2">お面屋</text>
+      <!-- 本部 -->
+      <rect x="210" y="214" width="100" height="24" fill="#8a7bd8" class="booth"/>
+      <text x="260" y="230" text-anchor="middle" class="lbl2">本部・救護</text>
+      <rect x="30" y="214" width="100" height="24" fill="#8a7bd8" class="booth"/>
+      <text x="80" y="230" text-anchor="middle" class="lbl2">第2駐車場方面</text>
+    </svg>
+    <div class="map-note">参道をはさんで屋台が並びます。神社境内は21時以降立入禁止。</div>
+  </div>
+</section>
+
+<section>
+  <h2>屋台のご案内</h2>
+
+  <div class="stall">
+    <h3>射的・輪投げ <span class="tag">あそび</span></h3>
+    <p>コルク銃5発300ケット。景品は駄菓子からミナミちゃんグッズまで。腕に自信のある方こそ、素の腕前でどうぞ。</p>
+    <span class="warn">電子照準補正・出力向上機能の使用は失格となります</span>
+  </div>
+
+  <div class="stall">
+    <h3>宇宙金魚すくい <span class="tag">あそび</span></h3>
+    <p>頭にチョウチンアンコウのような発光する触角を備えた、色とりどりの宇宙金魚。すくい方は昔ながらの水槽とポイです。餌は光なので、お持ち帰り後は明かりの下に置いてあげるだけ。夜は触角がやわらかく光ります。</p>
+  </div>
+
+  <div class="stall">
+    <h3>わたあめ・りんごあめ <span class="tag">砂糖取扱許可店</span></h3>
+    <p>連邦の販売許可を受けた、会場で唯一の本物の砂糖菓子です。数量限定・お一人様2点まで。毎年長い行列ができますので、お早めに。</p>
+    <span class="warn">許可証の掲示をご確認のうえお買い求めください</span>
+  </div>
+
+  <div class="stall">
+    <h3>宇宙鶏焼き鳥・宇宙ガニ焼き <span class="tag">たべもの</span></h3>
+    <p>炭火でじっくり焼いた宇宙鶏と、姿焼きの宇宙ガニ。バルナディア米の焼きおにぎりと一緒にどうぞ。</p>
+  </div>
+
+  <div class="stall">
+    <h3>かき氷・飲みもの <span class="tag">つめたいもの</span></h3>
+    <p>ふわふわの氷にシロップは代替甘味料仕立て。頭がキーンとなるのは生身の特権です。ヘルメット着用の方にはストロー対応メニューをご用意しています。</p>
+  </div>
+
+  <div class="stall">
+    <h3>くじびき <span class="tag">うんだめし</span></h3>
+    <p>特等はミナミちゃん直筆サイン入りポスター。はずれを引くと「地獄のピーヒャラ」が渡されます。それはそれで、この祭りの名物です。</p>
+  </div>
+
+  <div class="stall">
+    <h3>お面屋 <span class="tag">おみやげ</span></h3>
+    <p>昔ながらの狐面から最新アニメの顔まで幅広く取り揃えています。店主のおばあさんが、似合う一枚を見立ててくれるかもしれません。</p>
+  </div>
+</section>
+
+<section>
+  <h2>ご来場のみなさまへ</h2>
+  <div class="rules">
+    <h3>お知らせとお願い</h3>
+    <ul>
+      <li>砂糖類の持込・無許可販売は連邦法により禁止されています。許可店以外での甘味の受け渡しにご注意ください。</li>
+      <li>縁日の遊技における電子照準補正・筋力出力向上・演算予測などの機能利用はご遠慮ください。店主は見ています。</li>
+      <li>宇宙環境非対応の方はヘルメット着用のままご参加いただけます。飲食はストロー対応メニューをご利用ください。</li>
+      <li>はぐれた場合はピコポの位置共有機能をご利用いただくか、本部やぐらまでお越しください。迷子のお呼び出しも承ります。</li>
+      <li>ホバリング車でお越しの方は第2駐車場をご利用ください。会場上空でのホバリング観覧は花火打上のため禁止です。</li>
+      <li>浴衣・甚平でのご来場、大歓迎です。機体サイズの合う浴衣のご相談は本部までどうぞ。</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <h2>打上花火</h2>
+  <div class="fw-box" id="fwbox">
+    <div class="big">星空納涼花火</div>
+    <div class="time">20:30 打上開始</div>
+    <p style="font-size:13px;color:#b9b3d6;margin-top:8px">夜空と星と花火が重なるのは、この星ならでは。<br>となりの人と、見上げてください。</p>
+  </div>
+  <div class="links">
+    <a href="natsumatsuri-kuji.html">くじびき抽選器へ</a>
+  </div>
+</section>
+
+</main>
+
+<footer>宇宙夏祭り実行委員会</footer>
+
+<script>
+// 星
+const stars=document.getElementById('stars');
+for(let i=0;i<60;i++){
+  const s=document.createElement('span');
+  s.style.left=Math.random()*100+'%';
+  s.style.top=Math.random()*100+'%';
+  s.style.animationDelay=Math.random()*3+'s';
+  stars.appendChild(s);
+}
+// 花火（ボックス内）
+const fwbox=document.getElementById('fwbox');
+const cols=['#ff6b4a','#ffc94d','#4de8d2','#8a7bd8'];
+for(let i=0;i<4;i++){
+  const f=document.createElement('div');
+  f.className='fw';
+  const size=60+Math.random()*50;
+  f.style.width=f.style.height=size+'px';
+  f.style.left=(10+Math.random()*70)+'%';
+  f.style.top=(5+Math.random()*40)+'%';
+  const c=cols[i%cols.length];
+  f.style.background=`radial-gradient(circle,${c} 0%,transparent 65%)`;
+  f.style.animationDelay=(i*0.7)+'s';
+  fwbox.appendChild(f);
+}
+</script>
+</body>
+</html>
