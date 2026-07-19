@@ -27,38 +27,52 @@ h1{
 }
 .sub{font-size:13px;color:var(--murasaki)}
 main{max-width:480px;margin:0 auto;padding:10px 16px 60px}
-/* ガラガラ本体 */
+/* 抽選箱本体 */
 .machine{
   margin:22px auto 0;width:230px;position:relative;text-align:center;
 }
-.drum{
-  width:180px;height:180px;margin:0 auto;border-radius:20px;
-  background:linear-gradient(160deg,#c8402c,#8f2417);
+.box{
+  width:180px;height:170px;margin:0 auto;border-radius:10px;
+  background:
+    repeating-conic-gradient(from 0deg at 50% 40%, #c8402c 0deg 18deg, #e05a38 18deg 36deg);
   border:5px solid var(--kin);
-  box-shadow:0 0 26px rgba(255,107,74,.4), inset 0 -14px 22px rgba(0,0,0,.4);
-  position:relative;display:flex;align-items:center;justify-content:center;
+  box-shadow:0 0 26px rgba(255,107,74,.4), inset 0 -14px 22px rgba(0,0,0,.35);
+  position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
 }
-.drum .kanji{font-family:'Shippori Mincho',serif;font-size:56px;color:var(--washi);text-shadow:0 2px 4px rgba(0,0,0,.5)}
-.drum .handle{
-  position:absolute;right:-32px;top:50%;width:14px;height:60px;margin-top:-30px;
-  background:#d8c9a4;border-radius:7px;box-shadow:0 2px 4px rgba(0,0,0,.5);
-  transform-origin:50% 10%;
+.box .hole{
+  position:absolute;top:-14px;left:50%;transform:translateX(-50%);
+  width:96px;height:26px;border-radius:50%;
+  background:radial-gradient(ellipse at 50% 40%, #1a0d08 60%, #3a1c10);
+  border:4px solid #8f2417;box-shadow:inset 0 6px 10px rgba(0,0,0,.8);
 }
-.drum.spin{animation:shake .5s infinite}
-.drum.spin .handle{animation:crank .5s infinite linear}
-@keyframes shake{0%,100%{transform:rotate(0)}25%{transform:rotate(-2deg)}75%{transform:rotate(2deg)}}
-@keyframes crank{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+.box .box-label{
+  font-family:'Shippori Mincho',serif;font-weight:800;font-size:38px;letter-spacing:.08em;
+  color:var(--washi);text-shadow:0 2px 0 #8f2417, 0 4px 8px rgba(0,0,0,.4);
+  background:rgba(143,36,23,.55);padding:2px 14px;border-radius:8px;
+}
+.box .box-sub{
+  font-family:'DotGothic16',monospace;font-size:12px;letter-spacing:.35em;
+  color:var(--kin);background:#8f2417;padding:2px 12px 2px 14px;border-radius:20px;
+}
+.box.shake{animation:shake .18s infinite}
+@keyframes shake{0%,100%{transform:rotate(0) translateX(0)}25%{transform:rotate(-2deg) translateX(-3px)}75%{transform:rotate(2deg) translateX(3px)}}
 .tray{
   width:120px;height:16px;margin:0 auto;background:#3a3350;border-radius:0 0 12px 12px;
   box-shadow:inset 0 4px 6px rgba(0,0,0,.6);
 }
-.ball{
-  width:44px;height:44px;border-radius:50%;margin:-6px auto 0;opacity:0;
-  box-shadow:inset -6px -8px 12px rgba(0,0,0,.35), 0 0 18px currentColor;
+/* 三角くじ */
+.kuji{
+  width:74px;height:64px;margin:-4px auto 0;opacity:0;position:relative;
+  clip-path:polygon(50% 0,100% 100%,0 100%);
   transition:opacity .3s;
+  display:flex;align-items:flex-end;justify-content:center;
 }
-.ball.show{opacity:1;animation:drop .5s ease-out}
-@keyframes drop{0%{transform:translateY(-70px);opacity:0}60%{transform:translateY(6px);opacity:1}100%{transform:translateY(0)}}
+.kuji span{
+  font-family:'Shippori Mincho',serif;font-weight:800;font-size:24px;line-height:1;
+  padding-bottom:10px;text-shadow:0 1px 2px rgba(0,0,0,.25);
+}
+.kuji.show{opacity:1;animation:drop .55s ease-out}
+@keyframes drop{0%{transform:translateY(-90px) rotate(-14deg);opacity:0}60%{transform:translateY(6px) rotate(4deg);opacity:1}100%{transform:translateY(0) rotate(0)}}
 /* ボタン */
 .draw-btn{
   display:block;width:100%;max-width:280px;margin:26px auto 0;
@@ -98,27 +112,28 @@ main{max-width:480px;margin:0 auto;padding:10px 16px 60px}
 .table li:last-child{border-bottom:none}
 .table .r{font-weight:700;white-space:nowrap}
 .back{display:block;text-align:center;margin-top:28px;font-family:'DotGothic16',monospace;color:var(--neon);text-decoration:none;letter-spacing:.15em;font-size:14px}
-@media (prefers-reduced-motion:reduce){.drum.spin,.drum.spin .handle,.ball.show,.result.show{animation:none}}
+@media (prefers-reduced-motion:reduce){.box.shake,.kuji.show,.result.show{animation:none}}
 </style>
 </head>
 <body>
 <header>
   <div class="eyebrow">GINKYO FESTIVAL LOTTERY</div>
   <h1>くじびき抽選器</h1>
-  <div class="sub">一回まわして、出た玉の色が運命です</div>
+  <div class="sub">箱に手を入れて、一枚引いてください</div>
 </header>
 
 <main>
   <div class="machine">
-    <div class="drum" id="drum">
-      <div class="kanji">運</div>
-      <div class="handle"></div>
+    <div class="box" id="box">
+      <div class="hole"></div>
+      <div class="box-label">抽選箱</div>
+      <div class="box-sub">LUCKY BOX</div>
     </div>
     <div class="tray"></div>
-    <div class="ball" id="ball"></div>
+    <div class="kuji" id="kuji"><span>？</span></div>
   </div>
 
-  <button class="draw-btn" id="drawBtn">ガラガラをまわす</button>
+  <button class="draw-btn" id="drawBtn">くじを引く</button>
 
   <div class="result" id="result">
     <div class="rank" id="rRank"></div>
@@ -172,8 +187,9 @@ const PRIZES=[
    flavor:"吹くと、この世のものとは思えない音が鳴る笛。返品はできません。責任を持って鳴らしてください。"}
 ];
 const total=PRIZES.reduce((a,p)=>a+p.w,0);
-const drum=document.getElementById('drum');
-const ball=document.getElementById('ball');
+const box=document.getElementById('box');
+const kuji=document.getElementById('kuji');
+const kujiMark=kuji.querySelector('span');
 const btn=document.getElementById('drawBtn');
 const result=document.getElementById('result');
 const rRank=document.getElementById('rRank');
@@ -185,15 +201,15 @@ let count=0;
 btn.addEventListener('click',()=>{
   btn.disabled=true;
   result.classList.remove('show');
-  ball.classList.remove('show');
-  drum.classList.add('spin');
+  kuji.classList.remove('show');
+  box.classList.add('shake');
   setTimeout(()=>{
-    drum.classList.remove('spin');
+    box.classList.remove('shake');
     let r=Math.random()*total,pick=PRIZES[PRIZES.length-1];
     for(const p of PRIZES){ if(r<p.w){pick=p;break;} r-=p.w; }
-    ball.style.background=`radial-gradient(circle at 35% 30%, #fff8, transparent 40%), ${pick.color}`;
-    ball.style.color=pick.color;
-    ball.classList.add('show');
+    kuji.style.background=`linear-gradient(160deg, rgba(255,255,255,.25), transparent 45%), ${pick.color}`;
+    kujiMark.style.color=(pick.color==="#f6f1e3"||pick.color==="#ffc94d")?"#2b2438":"#f6f1e3";
+    kuji.classList.add('show');
     setTimeout(()=>{
       rRank.textContent=pick.rank;
       rRank.style.color=pick.css==="#f6f1e3"?"#8a7a55":pick.css;
@@ -205,9 +221,9 @@ btn.addEventListener('click',()=>{
       li.innerHTML=`<span class="dot" style="background:${pick.color};color:${pick.color}"></span><span>${count}回目：${pick.rank}「${pick.prize}」</span>`;
       logList.prepend(li);
       btn.disabled=false;
-      btn.textContent="もう一回まわす";
-    },600);
-  },1400);
+      btn.textContent="もう一枚引く";
+    },650);
+  },1100);
 });
 </script>
 </body>
