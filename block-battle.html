@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>対戦ブロックパズル｜BLOCK BATTLE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Zen+Kaku+Gothic+New:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --night:#101532;--night-deep:#0a0d22;--washi:#f6f1e3;--sumi:#2b2438;
+  --shu:#ff6b4a;--kin:#ffc94d;--neon:#4de8d2;--murasaki:#8a7bd8;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{
+  font-family:'Zen Kaku Gothic New',sans-serif;
+  background:linear-gradient(180deg,var(--night-deep),var(--night) 55%,#1c1e46);
+  color:var(--washi);min-height:100vh;display:flex;flex-direction:column;align-items:center;
+  touch-action:manipulation;
+}
+h1{
+  font-family:'DotGothic16',monospace;font-size:20px;letter-spacing:.25em;
+  color:var(--kin);text-shadow:0 0 10px rgba(255,201,77,.6);padding:14px 0 4px;
+}
+.sub{font-size:11px;color:var(--murasaki);letter-spacing:.1em}
+/* ロビー */
+#lobby{max-width:340px;width:100%;padding:24px 20px;text-align:center}
+#lobby p{font-size:13px;line-height:1.8;color:#b9b3d6;margin-bottom:14px}
+#roomInput{
+  width:100%;font-family:'DotGothic16',monospace;font-size:26px;letter-spacing:.4em;text-align:center;
+  background:#050510;color:var(--neon);border:2px solid #2c2c55;border-radius:10px;padding:12px 0 12px .4em;
+  outline:none;
+}
+#roomInput:focus{border-color:var(--neon);box-shadow:0 0 12px rgba(77,232,210,.35)}
+.btn{
+  display:block;width:100%;margin-top:14px;
+  font-family:'DotGothic16',monospace;font-size:17px;letter-spacing:.2em;
+  color:var(--night-deep);background:var(--kin);border:none;border-radius:10px;
+  padding:14px 0;cursor:pointer;box-shadow:0 4px 0 #a8802a;
+}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 #a8802a}
+.btn.sub-btn{background:#3a3a68;color:var(--washi);box-shadow:0 4px 0 #23234a}
+#lobbyMsg{margin-top:12px;font-size:13px;color:var(--neon);min-height:20px;font-family:'DotGothic16',monospace}
+/* ゲーム画面 */
+#game{display:none;width:100%;max-width:430px;padding:0 10px 14px}
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px}
+.info{font-family:'DotGothic16',monospace;font-size:12px;line-height:1.7;color:#b9b3d6}
+.info b{color:var(--kin);font-size:15px}
+.info .atk{color:var(--shu)}
+.oppbox{text-align:center}
+.oppbox .lbl{font-size:10px;color:var(--murasaki);font-family:'DotGothic16',monospace;letter-spacing:.1em}
+canvas{display:block;background:#0b0e26;border:2px solid #34346a;border-radius:6px}
+#board{margin:0 auto;box-shadow:0 0 18px rgba(77,232,210,.15)}
+.mid{display:flex;justify-content:center;gap:10px}
+.side{display:flex;flex-direction:column;gap:6px;align-items:center}
+.side .lbl{font-size:10px;color:var(--murasaki);font-family:'DotGothic16',monospace}
+/* 操作ボタン */
+#pads{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-top:10px}
+.pad{
+  font-family:'DotGothic16',monospace;font-size:22px;color:var(--washi);
+  background:#22254d;border:1px solid #3a3a68;border-radius:10px;padding:14px 0;
+  cursor:pointer;user-select:none;
+}
+.pad:active{background:#3a3a68}
+/* オーバーレイ */
+#overlay{
+  position:fixed;inset:0;background:rgba(5,5,16,.82);display:none;
+  align-items:center;justify-content:center;flex-direction:column;gap:16px;z-index:10;text-align:center;padding:20px;
+}
+#overlay .big{font-family:'DotGothic16',monospace;font-size:34px;letter-spacing:.15em;color:var(--kin);text-shadow:0 0 16px rgba(255,201,77,.7)}
+#overlay .detail{font-size:14px;color:#b9b3d6;line-height:1.8}
+#overlay .btn{max-width:240px}
+</style>
+</head>
+<body>
+<h1>BLOCK BATTLE</h1>
+<div class="sub">― 対戦ブロックパズル ―</div>
+
+<div id="lobby">
+  <p>ふたりで同じ部屋番号（4桁）を入力してください。<br>先に入った人が P1 になります。</p>
+  <input id="roomInput" inputmode="numeric" maxlength="4" placeholder="0000">
+  <button class="btn" id="joinBtn">入室する</button>
+  <div id="lobbyMsg"></div>
+</div>
+
+<div id="game">
+  <div class="top">
+    <div class="info">
+      <div>SCORE <b id="score">0</b></div>
+      <div>LINES <b id="lines">0</b></div>
+      <div class="atk">おじゃま予告 <b id="pending">0</b></div>
+    </div>
+    <div class="oppbox">
+      <div class="lbl">あいて</div>
+      <canvas id="oppBoard" width="60" height="120"></canvas>
+      <div class="info" style="text-align:center">L:<span id="oppLines">0</span></div>
+    </div>
+  </div>
+  <div class="mid">
+    <canvas id="board" width="240" height="480"></canvas>
+    <div class="side">
+      <div class="lbl">HOLD</div>
+      <canvas id="hold" width="72" height="72"></canvas>
+      <div class="lbl">NEXT</div>
+      <canvas id="next" width="72" height="72"></canvas>
+    </div>
+  </div>
+  <div id="pads">
+    <button class="pad" id="pL">←</button>
+    <button class="pad" id="pD">↓</button>
+    <button class="pad" id="pR">→</button>
+    <button class="pad" id="pRot">⟳</button>
+    <button class="pad" id="pDrop">⤓</button>
+    <button class="pad" id="pHold">⇄</button>
+  </div>
+</div>
+
+<div id="overlay">
+  <div class="big" id="ovTitle"></div>
+  <div class="detail" id="ovDetail"></div>
+  <button class="btn" id="rematchBtn">もう一戦</button>
+  <button class="btn sub-btn" onclick="location.reload()">退室する</button>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script>
+firebase.initializeApp({
+  apiKey: "AIzaSyDNnsdT2yMXm5-re1QFsVec1cS0bIIJMUQ",
+  authDomain: "usb-net.firebaseapp.com",
+  databaseURL: "https://usb-net-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "usb-net",
+  storageBucket: "usb-net.firebasestorage.app",
+  messagingSenderId: "518456471647",
+  appId: "1:518456471647:web:a54c6e63eb65cb30c1abea"
+});
+const db=firebase.database();
+
+/* ====== 盤面・ピース ====== */
+const COLS=10,ROWS=20,CELL=24;
+const COLORS=[null,"#4de8d2","#ffc94d","#8a7bd8","#3ecf8e","#ff6b4a","#4da6ff","#ff9ecb","#6b7280"]; // 8=おじゃま
+const SHAPES={
+  1:[[1,1,1,1]],            // I
+  2:[[2,2],[2,2]],          // O
+  3:[[0,3,0],[3,3,3]],      // T
+  4:[[0,4,4],[4,4,0]],      // S
+  5:[[5,5,0],[0,5,5]],      // Z
+  6:[[6,0,0],[6,6,6]],      // J
+  7:[[0,0,7],[7,7,7]]       // L
+};
+let board,cur,curX,curY,nextPiece,bag=[];
+let holdPiece=null,holdUsed=false;
+let score=0,lines=0,pendingGarbage=0,alive=false,playing=false;
+let dropTimer=null;
+
+function newBag(){bag=[1,2,3,4,5,6,7].sort(()=>Math.random()-.5)}
+function takePiece(){if(!bag.length)newBag();const t=bag.pop();return SHAPES[t].map(r=>r.slice())}
+function rotate(m){return m[0].map((_,i)=>m.map(r=>r[i]).reverse())}
+function collide(b,p,x,y){
+  for(let r=0;r<p.length;r++)for(let c=0;c<p[r].length;c++){
+    if(!p[r][c])continue;
+    const nx=x+c,ny=y+r;
+    if(nx<0||nx>=COLS||ny>=ROWS)return true;
+    if(ny>=0&&b[ny][nx])return true;
+  }
+  return false;
+}
+function merge(){
+  cur.forEach((row,r)=>row.forEach((v,c)=>{
+    if(v&&curY+r>=0)board[curY+r][curX+c]=v;
+  }));
+}
+function clearLines(){
+  let n=0;
+  for(let r=ROWS-1;r>=0;r--){
+    if(board[r].every(v=>v)){board.splice(r,1);board.unshift(Array(COLS).fill(0));n++;r++;}
+  }
+  return n;
+}
+function addGarbage(n){
+  for(let i=0;i<n;i++){
+    board.shift();
+    const row=Array(COLS).fill(8);
+    row[Math.floor(Math.random()*COLS)]=0;
+    board.push(row);
+  }
+  if(collide(board,cur,curX,curY))curY--; // 押し上げ救済
+}
+function spawn(){
+  cur=nextPiece||takePiece();
+  nextPiece=takePiece();
+  curX=Math.floor((COLS-cur[0].length)/2);curY=-1;
+  holdUsed=false;
+  drawNext();
+  if(collide(board,cur,curX,curY+1)){topOut();}
+}
+function doHold(){
+  if(!alive||holdUsed)return;
+  holdUsed=true;
+  if(holdPiece){
+    const tmp=holdPiece;holdPiece=cur;cur=tmp;
+  }else{
+    holdPiece=cur;cur=nextPiece;nextPiece=takePiece();drawNext();
+  }
+  curX=Math.floor((COLS-cur[0].length)/2);curY=-1;
+  drawHold();
+  if(collide(board,cur,curX,curY+1)){topOut();return;}
+  draw();
+}
+function lockPiece(){
+  merge();
+  const n=clearLines();
+  if(n>0){
+    score+=[0,100,300,500,800][n];
+    lines+=n;
+    const atk=[0,0,1,2,4][n];
+    if(atk>0)sendAttack(atk);
+  }
+  // おじゃま適用（自ロック後）
+  if(pendingGarbage>0)consumeGarbage();
+  spawn();
+  syncState();
+  updateHud();
+  resetGravity();
+}
+function tick(){
+  if(!alive)return;
+  if(!collide(board,cur,curX,curY+1)){curY++;}
+  else{lockPiece();}
+  draw();
+}
+function resetGravity(){
+  clearInterval(dropTimer);
+  const sp=Math.max(140,800-lines*22);
+  dropTimer=setInterval(tick,sp);
+}
+function move(dx){if(!alive)return;if(!collide(board,cur,curX+dx,curY)){curX+=dx;draw();}}
+function softDrop(){if(!alive)return;if(!collide(board,cur,curX,curY+1)){curY++;score+=1;draw();updateHud();}else{lockPiece();draw();}}
+function hardDrop(){if(!alive)return;while(!collide(board,cur,curX,curY+1)){curY++;score+=2;}lockPiece();draw();updateHud();}
+function doRotate(){
+  if(!alive)return;
+  const r=rotate(cur);
+  for(const k of [0,-1,1,-2,2]){
+    if(!collide(board,r,curX+k,curY)){cur=r;curX+=k;draw();return;}
+  }
+}
+
+/* ====== 描画 ====== */
+const cv=document.getElementById('board'),ctx=cv.getContext('2d');
+const ncv=document.getElementById('next'),nctx=ncv.getContext('2d');
+const ocv=document.getElementById('oppBoard'),octx=ocv.getContext('2d');
+function cell(g,x,y,s,v){
+  g.fillStyle=COLORS[v];g.fillRect(x,y,s,s);
+  g.fillStyle="rgba(255,255,255,.22)";g.fillRect(x,y,s,s*.22);
+  g.fillStyle="rgba(0,0,0,.28)";g.fillRect(x,y+s*.8,s,s*.2);
+}
+function draw(){
+  ctx.clearRect(0,0,cv.width,cv.height);
+  ctx.strokeStyle="rgba(58,58,104,.35)";
+  for(let i=1;i<COLS;i++){ctx.beginPath();ctx.moveTo(i*CELL,0);ctx.lineTo(i*CELL,cv.height);ctx.stroke();}
+  board.forEach((row,r)=>row.forEach((v,c)=>{if(v)cell(ctx,c*CELL,r*CELL,CELL,v)}));
+  if(cur){
+    // ゴースト（落下予測位置）
+    let gy=curY;
+    while(!collide(board,cur,curX,gy+1))gy++;
+    if(gy>curY){
+      ctx.globalAlpha=.25;
+      cur.forEach((row,r)=>row.forEach((v,c)=>{
+        if(v&&gy+r>=0)cell(ctx,(curX+c)*CELL,(gy+r)*CELL,CELL,v);
+      }));
+      ctx.globalAlpha=1;
+    }
+    cur.forEach((row,r)=>row.forEach((v,c)=>{
+      if(v&&curY+r>=0)cell(ctx,(curX+c)*CELL,(curY+r)*CELL,CELL,v);
+    }));
+  }
+}
+function drawHold(){
+  const h=document.getElementById('hold'),hctx=h.getContext('2d');
+  hctx.clearRect(0,0,72,72);
+  if(!holdPiece)return;
+  const s=14,w=holdPiece[0].length*s,ht=holdPiece.length*s;
+  holdPiece.forEach((row,r)=>row.forEach((v,c)=>{
+    if(v)cell(hctx,(72-w)/2+c*s,(72-ht)/2+r*s,s,v);
+  }));
+}
+function drawNext(){
+  nctx.clearRect(0,0,72,72);
+  const s=14,w=nextPiece[0].length*s,h=nextPiece.length*s;
+  nextPiece.forEach((row,r)=>row.forEach((v,c)=>{
+    if(v)cell(nctx,(72-w)/2+c*s,(72-h)/2+r*s,s,v);
+  }));
+}
+function drawOpp(str,oppLines){
+  octx.clearRect(0,0,60,120);
+  if(!str)return;
+  const s=6;
+  for(let i=0;i<200;i++){
+    const v=+str[i];
+    if(v)cell(octx,(i%10)*s,Math.floor(i/10)*s,s,v);
+  }
+  document.getElementById('oppLines').textContent=oppLines||0;
+}
+function updateHud(){
+  document.getElementById('score').textContent=score;
+  document.getElementById('lines').textContent=lines;
+  document.getElementById('pending').textContent=pendingGarbage;
+}
+
+/* ====== Firebase同期 ====== */
+let roomRef,me,opp;
+function join(){
+  const code=document.getElementById('roomInput').value.trim();
+  if(!/^\d{4}$/.test(code)){msg("4桁の数字を入れてください");return;}
+  roomRef=db.ref('games/bb/'+code);
+  roomRef.child('players').transaction(p=>{
+    p=p||{};
+    if(!p.p1){p.p1=true;me='p1';opp='p2';}
+    else if(!p.p2){p.p2=true;me='p2';opp='p1';}
+    else return; // 満室→abort
+    return p;
+  },(err,committed)=>{
+    if(err||!committed){msg("満室です。別の番号でどうぞ");return;}
+    msg(me==='p1'?"P1として入室。相手を待っています…":"P2として入室。まもなく開始…");
+    setupListeners();
+    roomRef.child('players').on('value',s=>{
+      const p=s.val()||{};
+      if(p.p1&&p.p2&&me==='p1'){
+        roomRef.child('startAt').set(Date.now()+3000);
+      }
+    });
+  });
+  roomRef.onDisconnect().update({}); // 接続維持のみ
+}
+function setupListeners(){
+  roomRef.child('startAt').on('value',s=>{
+    const t=s.val();
+    if(!t)return;
+    const wait=Math.max(0,t-Date.now());
+    msg("開始まで "+Math.ceil(wait/1000)+" 秒…");
+    setTimeout(startGame,wait);
+  });
+  roomRef.child('state/'+opp).on('value',s=>{
+    const v=s.val();
+    if(!v)return;
+    drawOpp(v.b,v.l);
+    if(playing&&v.alive===false&&alive){win();}
+  });
+  roomRef.child('attack/'+me).on('value',s=>{
+    pendingGarbage=s.val()||0;
+    updateHud();
+  });
+  roomRef.child('rematch').on('value',s=>{
+    const r=s.val()||{};
+    if(r.p1&&r.p2&&me==='p1'){
+      roomRef.update({rematch:null,state:null,attack:null,startAt:Date.now()+3000});
+    }
+  });
+}
+function sendAttack(n){
+  roomRef.child('attack/'+opp).transaction(v=>(v||0)+n);
+}
+function consumeGarbage(){
+  const n=pendingGarbage;
+  roomRef.child('attack/'+me).transaction(v=>0);
+  pendingGarbage=0;
+  addGarbage(n);
+}
+function syncState(){
+  const b=board.map(r=>r.join('')).join('');
+  roomRef.child('state/'+me).set({b,l:lines,s:score,alive});
+}
+function startGame(){
+  document.getElementById('lobby').style.display='none';
+  document.getElementById('game').style.display='block';
+  document.getElementById('overlay').style.display='none';
+  board=Array.from({length:ROWS},()=>Array(COLS).fill(0));
+  score=0;lines=0;pendingGarbage=0;alive=true;playing=true;nextPiece=null;newBag();
+  holdPiece=null;holdUsed=false;drawHold();
+  spawn();syncState();updateHud();draw();resetGravity();
+}
+function topOut(){
+  alive=false;playing=false;clearInterval(dropTimer);
+  syncState();
+  showOverlay("まけ…","相手の勝利です。SCORE "+score);
+}
+function win(){
+  playing=false;alive=false;clearInterval(dropTimer);
+  showOverlay("かち！","相手がトップアウト。SCORE "+score);
+}
+function showOverlay(t,d){
+  document.getElementById('ovTitle').textContent=t;
+  document.getElementById('ovDetail').textContent=d;
+  document.getElementById('overlay').style.display='flex';
+}
+function msg(t){document.getElementById('lobbyMsg').textContent=t}
+
+document.getElementById('joinBtn').onclick=join;
+document.getElementById('rematchBtn').onclick=()=>{
+  roomRef.child('rematch/'+me).set(true);
+  document.getElementById('ovDetail').textContent="相手の「もう一戦」を待っています…";
+};
+
+/* ====== 操作 ====== */
+function bindPad(id,fn){
+  const el=document.getElementById(id);
+  el.addEventListener('touchstart',e=>{e.preventDefault();fn();},{passive:false});
+  el.addEventListener('mousedown',e=>{e.preventDefault();fn();});
+}
+bindPad('pL',()=>move(-1));
+bindPad('pR',()=>move(1));
+bindPad('pD',softDrop);
+bindPad('pRot',doRotate);
+bindPad('pDrop',hardDrop);
+bindPad('pHold',doHold);
+document.addEventListener('keydown',e=>{
+  if(!playing)return;
+  if(e.key==='ArrowLeft')move(-1);
+  else if(e.key==='ArrowRight')move(1);
+  else if(e.key==='ArrowDown')softDrop();
+  else if(e.key==='ArrowUp'||e.key==='x'||e.key==='X')doRotate();
+  else if(e.key==='c'||e.key==='C'||e.key==='Shift')doHold();
+  else if(e.key===' '){e.preventDefault();hardDrop();}
+});
+</script>
+</body>
+</html>
